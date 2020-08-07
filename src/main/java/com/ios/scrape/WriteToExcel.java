@@ -1,6 +1,8 @@
 /**
  * @author Sridev Balakrishnan
- *
+ * @Purpose: Excel data writer
+ * @Input: Array of Reviews
+ * @Output: Writes to an XLSX file
  */
 package com.ios.scrape;
 
@@ -24,6 +26,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.ios.scarpe.domain.Response;
 
 public class WriteToExcel {
+	
+	static final String OUTPUT_FILE = "C:\\Users\\sridev_balakrishnan\\Desktop\\optimum_support_ios_reviews.xlsx";
+	static final String WORKSHEET_NAME = "iOS Optimum App Reviews";
+	static final String DATE_FORMAT = "MM-dd-yyyy";
 
 	private WriteToExcel() {
 		throw new IllegalStateException("Utility class");
@@ -35,17 +41,17 @@ public class WriteToExcel {
 
 		try (
 				// Create a Workbook
-				Workbook workbook = new XSSFWorkbook() // new HSSFWorkbook() for generating `.xls` file
+				Workbook workbook = new XSSFWorkbook()
 		) {
 
 			/*
-			 * CreationHelper helps us create instances of various things like DataFormat,
-			 * Hyperlink, RichTextString etc, in a format (HSSF, XSSF) independent way
+			 * CreationHelper createS instances of various things like DataFormat,
+			 * Hyperlink, RichTextString etc, in a format (XSSF) independent way
 			 */
 			CreationHelper createHelper = workbook.getCreationHelper();
 
 			// Create a Sheet
-			XSSFSheet sheet = (XSSFSheet) workbook.createSheet("iOS Optimum App Reviews");
+			XSSFSheet sheet = (XSSFSheet) workbook.createSheet(WORKSHEET_NAME);
 			sheet.addIgnoredErrors(new CellRangeAddress(0, 9999, 0, 9999), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
 			
 			// Create a Font for styling header cells
@@ -71,7 +77,7 @@ public class WriteToExcel {
 
 			// Create Cell Style for formatting Date
 			CellStyle dateCellStyle = workbook.createCellStyle();
-			dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM-dd-yyyy"));
+			dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat(DATE_FORMAT));
 
 			// Create Other rows and cells with employees data
 			int rowNum = 1;
@@ -94,8 +100,7 @@ public class WriteToExcel {
 				sheet.autoSizeColumn(col.ordinal());
 			
 			// Write the output to a file
-			FileOutputStream fileOut = new FileOutputStream(
-					"C:\\Users\\SridevBalakrishnan\\Desktop\\optimum_support_ios_reviews.xlsx");
+			FileOutputStream fileOut = new FileOutputStream(OUTPUT_FILE);
 			workbook.write(fileOut);
 			fileOut.close();
 		} catch (Exception ex) {
