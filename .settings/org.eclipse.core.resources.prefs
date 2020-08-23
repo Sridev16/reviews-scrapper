@@ -1,2 +1,3 @@
 eclipse.preferences.version=1
-encoding//src/main/java/com/ios/scrape/ReviewsScrapper.java=UTF-8
+encoding//src/main/java/com/reviews/analyze/AnalyzeEntitySentiment.java=UTF-8
+encoding//src/main/java/com/reviews/scrape/IOSReviewsScrapper.java=UTF-8
