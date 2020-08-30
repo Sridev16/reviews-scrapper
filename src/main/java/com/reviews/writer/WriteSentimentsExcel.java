@@ -13,26 +13,26 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IgnoredErrorType;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.reviews.domain.ReviewSentiment;
+
+import com.reviews.writer.utils.WorkSheetUtility;
 
 public class WriteSentimentsExcel {
 	
 	static final Logger log = LogManager.getLogger(WriteSentimentsExcel.class.getName());
 	
 	static final String OUTPUT_FILE = "C:\\Users\\SridevBalakrishnan\\Desktop\\optimum_support_NLP.xlsx";
-	static final String WORKSHEET_NAME = "iOS Optimum App Reviews NLP";
+	static final String WORKSHEET_NAME = "Optimum App Reviews NLP";
 	static final String DATE_FORMAT = "MM-dd-yyyy";
 
 	public WriteSentimentsExcel() {
@@ -42,7 +42,9 @@ public class WriteSentimentsExcel {
 	enum Columns { TYPE, DATE, RATING, USERNAME, COMMENTS, ENTITY, SALIENCE, MAGNITUDE, SCORE }
 
 	public static void writer(List<ReviewSentiment> reviews) throws IOException {
-
+		
+		WorkSheetUtility wsUtil = new WorkSheetUtility();
+		
 		try (
 				// Create a Workbook
 				Workbook workbook = new XSSFWorkbook()
@@ -52,40 +54,33 @@ public class WriteSentimentsExcel {
 			 * CreationHelper createS instances of various things like DataFormat,
 			 * Hyperlink, RichTextString etc, in a format (XSSF) independent way
 			 */
-			CreationHelper createHelper = workbook.getCreationHelper();
+			CreationHelper createHelper = wsUtil.createCreationHelper(workbook);
 
 			// Create a Sheet
-			XSSFSheet sheet = (XSSFSheet) workbook.createSheet(WORKSHEET_NAME);
-			sheet.addIgnoredErrors(new CellRangeAddress(0, 9999, 0, 9999), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
-			
+			XSSFSheet sheet = wsUtil.createSheet(workbook, WORKSHEET_NAME);
+
 			// Create a Font for styling header cells
-			Font headerFont = workbook.createFont();
-			headerFont.setBold(true);
-			headerFont.setFontHeightInPoints((short) 12);
-			headerFont.setColor(IndexedColors.BLUE.getIndex());
+			Font headerFont = wsUtil.createHeaderFont(workbook);
 
 			// Create a CellStyle with the font
-			CellStyle headerCellStyle = workbook.createCellStyle();
-			headerCellStyle.setFont(headerFont);
+			CellStyle headerCellStyle = wsUtil.createHeaderCellStyle(workbook, headerFont);
 
 			// Create a Row
-			Row headerRow = sheet.createRow(0);
-			
+			Row headerRow = wsUtil.createHeaderRow (sheet);
+
 			// Create column headings
 			Columns[] arr = Columns.values();			
-	        for (Columns col : arr) { 	            
-	        	Cell cell = headerRow.createCell(col.ordinal());
+			for (Columns col : arr) { 	            
+				Cell cell = headerRow.createCell(col.ordinal());
 				cell.setCellValue(col.toString());
 				cell.setCellStyle(headerCellStyle);
-	        } 
+			} 
 
 			// Create Cell Style for formatting Date
-			CellStyle dateCellStyle = workbook.createCellStyle();
-			dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat(DATE_FORMAT));
-			
-			// Create Cell Style for formatting Date
-			CellStyle wrapCellStyle = workbook.createCellStyle();
-			wrapCellStyle.setWrapText(true);
+			CellStyle dateCellStyle = wsUtil.createDateCellStyle(workbook, createHelper);
+
+			// Create Cell Style for wrapping text
+			CellStyle wrapCellStyle = wsUtil.createWrapCellStyle(workbook);
 
 			// Create Other rows and cells with review data
 			int rowNum = 1;

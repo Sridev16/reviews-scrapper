@@ -3,8 +3,7 @@
  * @Purpose: To read Optimum Support App reviews from apple site
  * @Input:
  * @Output: List of Android user reviews sorted by date
- * 
- */
+ * */
 
 package com.reviews.scrape;
 
@@ -18,13 +17,8 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -33,13 +27,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.reviews.domain.Response;
-import com.reviews.writer.WriteReviewsExcel;
 
-import io.github.crew102.rapidrake.RakeAlgorithm;
-import io.github.crew102.rapidrake.data.SmartWords;
-import io.github.crew102.rapidrake.model.RakeParams;
-import io.github.crew102.rapidrake.model.Result;
+import com.reviews.domain.Response;
 
 public class IOSReviewsScrapper {
 
@@ -70,44 +59,6 @@ public class IOSReviewsScrapper {
 
 		// Sort by date; latest review first
 		responses.sort(Comparator.comparing(Response::getDate).reversed());
-
-		// Print sorted data to MS Excel file
-		WriteReviewsExcel.writer(responses);
-
-		// Create a string builder for data analysis
-		StringBuilder review = new StringBuilder();
-		for (Response response : responses) {
-			review.append(" " +response.getReview());
-		}
-
-		// NLP keyword extractions
-		String[] stopWords = new SmartWords().getSmartWords(); 
-		String[] stopPOS = {"VB", "VBD", "VBG", "VBN", "VBP", "VBZ"}; 
-		int minWordChar = 1;
-		boolean shouldStem = true;
-		String phraseDelims = "[-,.?():;\"!/]"; 
-		RakeParams params = new RakeParams(stopWords, stopPOS, minWordChar, shouldStem, phraseDelims);
-
-		// Create a RakeAlgorithm object
-		RakeAlgorithm rakeAlg = new RakeAlgorithm(params, POS_TAGGER_URL, SENT_DETECT_URL);
-
-		// Call the rake method
-		Result result = rakeAlg.rake(review.toString());
-		result = result.distinct();
-		HashMap<String, Float> resultsMap = new HashMap<>();
-		String[] resultKeywords = result.getFullKeywords();
-		float[] resultScore = result.getScores();
-		// Print the result
-		for (int i=0; i < resultScore.length; i ++) {
-			if (resultScore[i] > THRESHOLD_RAKE_VAL)
-				resultsMap.put(resultKeywords[i], resultScore[i]);	    	
-		}
-		Map<String, Float> sortedMap = 
-				resultsMap.entrySet().stream()
-				.sorted(Entry.comparingByValue())
-				.collect(Collectors.toMap(Entry::getKey, Entry::getValue,
-						(e1, e2) -> e1, LinkedHashMap::new));
-		sortedMap.forEach((key, value) -> log.info(String.format("[ %s ] [ %s ]", key, value)));
 
 		System.exit(0);
 	}
