@@ -34,7 +34,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.reviews.domain.Response;
-import com.reviews.writer.WriteReviewsExcel;
+import com.reviews.writer.ResponseWriterExcel;
 
 
 public class AndroidReviewsScrapper {
@@ -62,6 +62,8 @@ public class AndroidReviewsScrapper {
 	static String commentXPath = ".//div[contains(@class,'UD7Dzf')]//span";
 	static String likesXPath = ".//div[contains(@class,'xKpxId zc7KVe')] //div[contains(@class,'YCMBp GVFJbb')]//div"
 								+ "//div[contains(@class,'XlMhZe')]//div[contains(@class,'jUL89d y92BAb')]";
+	static final String OUTPUT_FILE_RS = "C:\\Users\\SridevBalakrishnan\\Desktop\\optimum_support_NLP.xlsx";
+	static final String WORKSHEET_NAME_RS = "Optimum App Reviews NLP";
 
 	private AndroidReviewsScrapper() {
 		// Utility class
@@ -76,7 +78,7 @@ public class AndroidReviewsScrapper {
 		responseLst.sort(Comparator.comparing(Response::getDate).reversed());
 
 		// Write sorted data to MS Excel file
-		WriteReviewsExcel.writer(responseLst);
+		ResponseWriterExcel.writer(responseLst,null,OUTPUT_FILE_RS,WORKSHEET_NAME_RS);
 
 		System.exit(0);
 	}

@@ -36,7 +36,7 @@ import com.google.cloud.language.v1beta2.AnalyzeEntitySentimentRequest;
 
 import com.reviews.domain.Response;
 import com.reviews.domain.ReviewSentiment;
-import com.reviews.writer.WriteSentimentsExcel;
+import com.reviews.writer.ResponseWriterExcel;
 
 public class AnalyzeEntitySentiment {
 
@@ -46,6 +46,8 @@ public class AnalyzeEntitySentiment {
 	static final String[] items = {"account", "bill", "cable", "crash", "auto", "phone", "ios", "android", "internet", 
 			"tv", "email", "password", "security", "chat", "support", "work", "bad", "good", "faq", 
 			"face", "touch", "login", "wifi", "modem", "router"};
+	static final String OUTPUT_FILE_RS = "C:\\Users\\SridevBalakrishnan\\Desktop\\optimum_support_NLP.xlsx";
+	static final String WORKSHEET_NAME_RS = "Optimum App Reviews NLP";
 
 	public static void main(String... args) throws Exception {
 
@@ -119,7 +121,7 @@ public class AnalyzeEntitySentiment {
 			log.error("IO Exception in sentiment analysis >>> {0}",e);
 		}
 		List<ReviewSentiment> reviews = computeSentimentIndex(respLst);
-		WriteSentimentsExcel.writer(reviews);
+		ResponseWriterExcel.writer(null, reviews, OUTPUT_FILE_RS, WORKSHEET_NAME_RS);
 	}
 
 	public static List<ReviewSentiment> computeSentimentIndex(List<Response> respLst) {

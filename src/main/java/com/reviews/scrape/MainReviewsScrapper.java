@@ -24,8 +24,7 @@ import org.apache.logging.log4j.Logger;
 import com.reviews.analyze.AnalyzeEntitySentiment;
 import com.reviews.domain.Response;
 import com.reviews.domain.ReviewSentiment;
-import com.reviews.writer.WriteReviewsExcel;
-import com.reviews.writer.WriteSentimentsExcel;
+import com.reviews.writer.ResponseWriterExcel;
 
 import io.github.crew102.rapidrake.RakeAlgorithm;
 import io.github.crew102.rapidrake.data.SmartWords;
@@ -41,6 +40,11 @@ public class MainReviewsScrapper {
 	static final String SENT_DETECT_URL = Objects.requireNonNull(IOSReviewsScrapper.class.getClassLoader().
 			getResource("en-sent.bin")).getPath(); // The path to your sentence detection model
 	static final double THRESHOLD_RAKE_VAL = 4.00;
+	static final String OUTPUT_FILE_R = "C:\\Users\\SridevBalakrishnan\\Desktop\\optimum_support_reviews.xlsx";
+	static final String WORKSHEET_NAME_R = "iOS Optimum App Reviews";
+	static final String OUTPUT_FILE_RS = "C:\\Users\\SridevBalakrishnan\\Desktop\\optimum_support_NLP.xlsx";
+	static final String WORKSHEET_NAME_RS = "Optimum App Reviews NLP";
+	
 	
 	/**
 	 * @param args
@@ -65,7 +69,7 @@ public class MainReviewsScrapper {
 		responseLst.sort(Comparator.comparing(Response::getDate).reversed());
 
 		// Write sorted data to MS Excel file
-		WriteReviewsExcel.writer(responseLst);
+		ResponseWriterExcel.writer(responseLst, null, OUTPUT_FILE_R, WORKSHEET_NAME_R);
 
 		// Create a string builder for data analysis
 		StringBuilder review = new StringBuilder();
@@ -103,7 +107,7 @@ public class MainReviewsScrapper {
 		sortedMap.forEach((key, value) -> log.info(String.format("[ %s ] [ %s ]", key, value)));
 		
 		revSentLst = AnalyzeEntitySentiment.computeSentimentIndex(responseLst);
-		WriteSentimentsExcel.writer(revSentLst);
+		ResponseWriterExcel.writer(null, revSentLst, OUTPUT_FILE_RS, WORKSHEET_NAME_RS);
 		System.exit(0);
 	}
 
